@@ -1,0 +1,67 @@
+<?php $helper = Mage::helper('stripe'); ?>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        var Mbrzuzy = window.Mbrzuzy || {};
+
+        Mbrzuzy.methodCode = '<?php echo $helper->getMethodCode(); ?>';
+        Mbrzuzy.targetForm = '#payment_form_<?php echo $helper->getMethodCode(); ?>';
+
+        Stripe.setPublishableKey('<?php echo $helper->getPublishableKey(); ?>');
+
+        Object.extend(Payment.prototype, {
+            save: function () {
+                if (checkout.loadWaiting!=false) return;
+                var validator = new Validation(this.form);
+                if (this.validate() && validator.validate()) {
+                    checkout.setLoadWaiting('payment');
+                    var fn = this[this.currentMethod + 'Save'].bind(this);
+                    if (typeof fn === 'function') {
+                        fn();
+                    } else {
+                        var request = new Ajax.Request(this.saveUrl, {
+                            method:'post',
+                            onComplete: this.onComplete,
+                            onSuccess: this.onSave,
+                            onFailure: checkout.ajaxFailure.bind(checkout),
+                            parameters: Form.serialize(this.form)
+                        });
+                    }
+                }
+            },
+            stripeSave: function () {
+                try {
+                    Stripe.createToken({
+                        number: jQuery('#' + Mbrzuzy.methodCode + '_cc_number').val(),
+                        cvc: jQuery('#' + Mbrzuzy.methodCode + '_cc_cid').val(),
+                        exp_month: jQuery('#' + Mbrzuzy.methodCode + '_expiration').val(),
+                        exp_year: jQuery('#' + Mbrzuzy.methodCode + '_expiration_yr').val()
+                    }, this.stripeResponse.bind(this));
+                } catch (error) {
+                    checkout.setLoadWaiting(false);
+                    alert(error);
+                }
+            },
+            stripeResponse: function (status, response) {
+                if (response.error) {
+                    checkout.setLoadWaiting(false);
+                    alert(Translator.translate(response.error.message).stripTags());
+                } else {
+                    jQuery('#stripe_token').val(response['id']);
+                    jQuery(Mbrzuzy.targetForm + ' input[type=text], ' + Mbrzuzy.targetForm + ' select').removeAttr('name');
+                    new Ajax.Request(this.saveUrl, {
+                        method: 'post',
+                        onComplete: this.onComplete,
+                        onSuccess: this.onSave,
+                        onFailure: checkout.ajaxFailure.bind(checkout),
+                        parameters: Form.serialize(this.form)
+                    });
+                }
+            }
+        });
+    });
+
+
+
+
+
+</script>

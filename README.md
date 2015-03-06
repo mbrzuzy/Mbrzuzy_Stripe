@@ -1,2 +1,2 @@
-# Mbrzuzy_Stripe
-Magento extension for credit card payments using Stripe.
+# Magento Stripe Extension 
+Magento extension for processing credit card payments using Stripe.

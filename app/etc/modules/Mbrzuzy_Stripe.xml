@@ -1,0 +1,11 @@
+<config>
+    <modules>
+        <Mbrzuzy_Stripe>
+            <active>true</active>
+            <codePool>local</codePool>
+        </Mbrzuzy_Stripe>
+        <depends>
+            <Mage_Payment />
+        </depends>
+    </modules>
+</config>

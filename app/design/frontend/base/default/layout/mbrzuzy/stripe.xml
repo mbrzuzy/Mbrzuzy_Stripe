@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <checkout_onepage_index>
+        <reference name="before_body_end">
+            <block type="core/text" name="stripe_api" after="-">
+                <action method="setText" ifconfig="payment/stripe/use_stripejs">
+                    <text>
+                        <![CDATA[
+                            <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+                        ]]>
+                    </text>
+                </action>
+            </block>
+            <block type="core/template" name="stripe_js" after="-">
+                <action method="setTemplate" ifconfig="payment/stripe/use_stripejs">
+                    <template>mbrzuzy/stripe/js.phtml</template>
+                </action>
+            </block>
+        </reference>
+    </checkout_onepage_index>
+</layout>
